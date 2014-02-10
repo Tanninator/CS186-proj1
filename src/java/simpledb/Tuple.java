@@ -71,7 +71,7 @@ public class Tuple implements Serializable {
              throw new RuntimeException("Incorrect field type");
          }
         fieldContents.set(i, f);
-        field[i] = f
+        field[i] = f;
     }
 
     /**
