@@ -14,7 +14,7 @@ import javax.xml.datatype.DatatypeConstants.Field;
  */
 public class Tuple implements Serializable {
 
-    private static final long serialVersionUID Field
+    private static final long serialVersionUID = 1L;
     private ArrayList<Field> fieldContents = new ArrayList<Field>();
     private TupleDesc descriptor;
     private int recordId;
