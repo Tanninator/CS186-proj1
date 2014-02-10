@@ -17,6 +17,7 @@ public class Tuple implements Serializable {
     private static final long serialVersionUID = 1L;
     private ArrayList<Field> fieldContents = new ArrayList<Field>();
     private TupleDesc descriptor;
+    private Field[] field;
     private RecordId rec;
 
     /**
@@ -66,7 +67,11 @@ public class Tuple implements Serializable {
      *            new value for the field.
      */
     public void setField(int i, Field f) {
+    	 if (f.getType() != descriptor.getFieldType(i)) {
+             throw new RuntimeException("Incorrect field type");
+         }
         fieldContents.set(i, f);
+        field[i] = f
     }
 
     /**
@@ -77,7 +82,8 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return fieldContents.get(i);
+        //return fieldContents.get(i);
+    	return field[i];
     }
 
     /**
