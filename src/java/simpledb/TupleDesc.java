@@ -3,8 +3,6 @@ package simpledb;
 import java.io.Serializable;
 import java.util.*;
 
-import com.sun.javadoc.Type;
-
 /**
  * TupleDesc describes the schema of a tuple.
  */
@@ -87,7 +85,7 @@ public class TupleDesc implements Serializable {
      * @return the number of fields in this TupleDesc
      */
     public int numFields() {
-        return typeArray.length;
+        return itemList.length;
     }
 
     /**
@@ -184,7 +182,7 @@ public class TupleDesc implements Serializable {
      * @return true if the object is equal to this TupleDesc.
      */
     public boolean equals(Object o) {
-        if (!o instanceof TupleDesc) {
+        if (!(o instanceof TupleDesc)) {
         	return false;
         }
         if (getSize() != ((TupleDesc)o).getSize()) {

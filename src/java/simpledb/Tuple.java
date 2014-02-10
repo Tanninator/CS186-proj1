@@ -17,7 +17,7 @@ public class Tuple implements Serializable {
     private static final long serialVersionUID = 1L;
     private ArrayList<Field> fieldContents = new ArrayList<Field>();
     private TupleDesc descriptor;
-    private int recordId;
+    private RecordId rec;
 
     /**
      * Create a new tuple with the specified schema (type).
@@ -44,7 +44,7 @@ public class Tuple implements Serializable {
      *         be null.
      */
     public RecordId getRecordId() {
-        return recordId;
+        return rec;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Tuple implements Serializable {
      *            the new RecordId for this tuple.
      */
     public void setRecordId(RecordId rid) {
-        recordId = rid;
+        rec = rid;
     }
 
     /**
@@ -90,7 +90,7 @@ public class Tuple implements Serializable {
      */
     public String toString() {
     	String resultString = "";
-    	for(int i=0; i<fieldContent.size(); i++) {
+    	for(int i=0; i<fieldContents.size(); i++) {
     		resultString += fieldContents.get(i).toString() + " ";
     	}
     	resultString += "\n";
