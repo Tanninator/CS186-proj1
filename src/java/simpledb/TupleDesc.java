@@ -85,7 +85,7 @@ public class TupleDesc implements Serializable {
      * @return the number of fields in this TupleDesc
      */
     public int numFields() {
-        return itemList.length;
+        return itemList.size();
     }
 
     /**
