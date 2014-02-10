@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import javax.xml.datatype.DatatypeConstants.Field;
-
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
  * specified schema specified by a TupleDesc object and contain Field objects
@@ -17,7 +15,6 @@ public class Tuple implements Serializable {
     private static final long serialVersionUID = 1L;
     private ArrayList<Field> fieldContents = new ArrayList<Field>();
     private TupleDesc descriptor;
-    private Field[] field;
     private RecordId rec;
 
     /**
@@ -71,7 +68,6 @@ public class Tuple implements Serializable {
              throw new RuntimeException("Incorrect field type");
          }
         fieldContents.set(i, f);
-        field[i] = f;
     }
 
     /**
@@ -82,8 +78,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        //return fieldContents.get(i);
-    	return field[i];
+        return fieldContents.get(i);
     }
 
     /**
