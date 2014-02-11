@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class TupleDesc implements Serializable {
 
-	ArrayList<TDItem> itemList = new ArrayList<TDItem>();
+	ArrayList<TDItem> itemList;
 	
     /**
      * A help class to facilitate organizing the information of each field
@@ -60,6 +60,7 @@ public class TupleDesc implements Serializable {
      *            be null.
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
+    	itemList = new ArrayList<TDItem>(typeAr.length);
     	for(int i=0; i<typeAr.length; i++) {
     		TDItem item = new TDItem(typeAr[i], fieldAr[i]);
     		itemList.add(item);
@@ -75,8 +76,9 @@ public class TupleDesc implements Serializable {
      *            TupleDesc. It must contain at least one entry.
      */
     public TupleDesc(Type[] typeAr) {
+    	itemList = new ArrayList<TDItem>(typeAr.length);
     	for(int i=0; i<typeAr.length; i++) {
-    		TDItem item = new TDItem(typeAr[i], null);
+    		TDItem item = new TDItem(typeAr[i], "");
     		itemList.add(item); //npe thrown here
     	}
     }
@@ -115,7 +117,8 @@ public class TupleDesc implements Serializable {
      *             if i is not a valid field reference.
      */
     public Type getFieldType(int i) throws NoSuchElementException {
-    	if (i<itemList.size()) {
+    	if (i<itemList.size() || i > -1
+    			) {
     		return itemList.get(i).fieldType;
     	} else {
     		throw new NoSuchElementException();
@@ -133,7 +136,11 @@ public class TupleDesc implements Serializable {
      */
     public int fieldNameToIndex(String name) throws NoSuchElementException {
         for(int i=0; i<itemList.size(); i++) {
-        	if (itemList.get(i).fieldName.equals(name)) {
+        	TDItem item = itemList.get(i);
+        	if (item.fieldName == null) {
+    			continue;
+    		}
+        	if (item.fieldName.equals(name)) {
         		return i;
         	}
         }
@@ -145,7 +152,11 @@ public class TupleDesc implements Serializable {
      *         Note that tuples from a given TupleDesc are of a fixed size.
      */
     public int getSize() {
-        return itemList.size();
+    	int length = 0;
+        for (TDItem item : itemList) {
+            length += item.fieldType.getLen();
+        }
+        return length;
     }
 
     /**
