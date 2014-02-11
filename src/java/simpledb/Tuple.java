@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class Tuple implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private ArrayList<Field> fieldContents = new ArrayList<Field>(10);
+    private ArrayList<Field> fieldContents;
     private TupleDesc descriptor;
     private RecordId rec;
 
@@ -25,9 +25,10 @@ public class Tuple implements Serializable {
      *            instance with at least one field.
      */
     public Tuple(TupleDesc td) {
-    	if (td.numFields() > 0) {
-    		descriptor = td;
-    	}
+    	descriptor = td;
+    	fieldContents = new ArrayList<Field>(td.numFields());
+    	System.out.println("printing size");
+    	System.out.println(td.numFields());
     }
 
     /**
@@ -64,9 +65,6 @@ public class Tuple implements Serializable {
      *            new value for the field.
      */
     public void setField(int i, Field f) {
-    	 if (f.getType() != descriptor.getFieldType(i)) {
-             throw new RuntimeException("Incorrect field type");
-         }
         fieldContents.set(i, f);
     }
 
