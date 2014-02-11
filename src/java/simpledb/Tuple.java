@@ -100,8 +100,8 @@ public class Tuple implements Serializable {
      * */
     public Iterator<Field> fields()
     {
-    	ArrayList<Field> list = new ArrayList<Field>(fields.length);
-    	for (int i = 0; i < fields.length; i++) {
+    	ArrayList<Field> list = new ArrayList<Field>(fieldContents.length);
+    	for (int i = 0; i < fieldContents.length; i++) {
     		list.add(fieldContents[i]);
     	}
         return list.iterator();
