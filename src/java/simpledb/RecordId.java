@@ -52,7 +52,7 @@ public class RecordId implements Serializable {
         if (!(o instanceof RecordId)) {
         	return false;
         }
-        return ((getPageId() == ((RecordId)o).getPageId() && tupleno() == ((RecordId)o).tupleno()));
+        return ((getPageId().hashCode() == ((RecordId)o).getPageId().hashCode() && tupleno() == ((RecordId)o).tupleno()));
     }
 
     /**
