@@ -36,12 +36,12 @@ public class Catalog {
 		}
 		
 		String getPkeyField() {
-			return pkeyField();
+			return pkeyField;
 		}
 	}
 	
-	public HashMap<Integer, DbFile> idTable;
-	public HashMap<String, DbFile> nameTable;
+	public HashMap<Integer, Table> idTable;
+	public HashMap<String, Table> nameTable;
 	
     /**
      * Constructor.
@@ -63,8 +63,8 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         Table newTable = new Table(file, name, pkeyField);
-        
-        
+        idTable.put(file.getId(), newTable);
+        nameTable.put(name, newTable);
     }
 
     public void addTable(DbFile file, String name) {
@@ -87,8 +87,7 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public int getTableId(String name) throws NoSuchElementException {
-        // some code goes here
-        return 0;
+        return nameTable.get(name).getDbFile().getId();
     }
 
     /**
@@ -98,8 +97,7 @@ public class Catalog {
      * @throws NoSuchElementException if the table doesn't exist
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+        return getDbFile(tableid).getTupleDesc();
     }
 
     /**
@@ -109,28 +107,25 @@ public class Catalog {
      *     function passed to addTable
      */
     public DbFile getDbFile(int tableid) throws NoSuchElementException {
-        // some code goes here
-        return null;
+    	return idTable.get(tableid).getDbFile();
     }
 
     public String getPrimaryKey(int tableid) {
-        // some code goes here
-        return null;
+    	return idTable.get(tableid).getPkeyField();
     }
 
     public Iterator<Integer> tableIdIterator() {
-        // some code goes here
-        return null;
+        return idTable.keySet().iterator();
     }
 
     public String getTableName(int id) {
-        // some code goes here
-        return null;
+    	return idTable.get(id).getName();
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
-        // some code goes here
+        idTable.clear();
+        nameTable.clear();
     }
     
     /**
