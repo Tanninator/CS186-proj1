@@ -1,6 +1,7 @@
 package simpledb;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * A RecordId is a reference to a specific tuple on a specific page of a
@@ -9,10 +10,9 @@ import java.io.Serializable;
 public class RecordId implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    private int tupleno;
     PageId pageId;
-    int tupleNum;
-    
+
     /**
      * Creates a new RecordId referring to the specified PageId and tuple
      * number.
@@ -23,15 +23,15 @@ public class RecordId implements Serializable {
      *            the tuple number within the page.
      */
     public RecordId(PageId pid, int tupleno) {
-        pageId = pid;
-        tupleNum = tupleno;
+    	this.tupleno = tupleno;
+    	this.pageId = pid;
     }
 
     /**
      * @return the tuple number this RecordId references.
      */
     public int tupleno() {
-        return tupleNum;
+        return tupleno;
     }
 
     /**
@@ -49,10 +49,10 @@ public class RecordId implements Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof RecordId)) {
-        	return false;
-        }
-        return hashCode() == ((RecordId) o).hashCode();
+    	if (o == null) {
+    		return false;
+    	}
+    	return o.hashCode() == hashCode();
     }
 
     /**
@@ -63,7 +63,7 @@ public class RecordId implements Serializable {
      */
     @Override
     public int hashCode() {
-        return 51*pageId.hashCode() + tupleNum*11;
+    	return tupleno * 19 + pageId.hashCode() * 31;
     }
 
 }
