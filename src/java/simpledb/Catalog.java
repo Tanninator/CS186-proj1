@@ -16,12 +16,40 @@ import java.util.*;
 
 public class Catalog {
 
+	private class Table {
+		private DbFile tableFile;
+		private String name;
+		private String pkeyField;
+		
+		Table(DbFile f, String n, String p) {
+			tableFile = f;
+			name = n;
+			pkeyField = p;
+		}
+		
+		DbFile getDbFile() {
+			return tableFile;
+		}
+		
+		String getName() {
+			return name;
+		}
+		
+		String getPkeyField() {
+			return pkeyField();
+		}
+	}
+	
+	public HashMap<Integer, DbFile> idTable;
+	public HashMap<String, DbFile> nameTable;
+	
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
-        // some code goes here
+        nameTable = new HashMap<String, Table>();
+        idTable = new HashMap<Integer, Table>();
     }
 
     /**
@@ -34,7 +62,9 @@ public class Catalog {
      * conflict exists, use the last table to be added as the table for a given name.
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+        Table newTable = new Table(file, name, pkeyField);
+        
+        
     }
 
     public void addTable(DbFile file, String name) {
