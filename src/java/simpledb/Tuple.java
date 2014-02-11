@@ -87,8 +87,8 @@ public class Tuple implements Serializable {
      */
     public String toString() {
     	String resultString = "";
-    	for(int i=0; i<fieldContents.size(); i++) {
-    		resultString += fieldContents.get(i).toString() + " ";
+    	for(int i=0; i<fieldContents.length; i++) {
+    		resultString += fieldContents[i].toString() + " ";
     	}
     	resultString += "\n";
     	return resultString;
@@ -100,6 +100,10 @@ public class Tuple implements Serializable {
      * */
     public Iterator<Field> fields()
     {
-        return fieldContents.iterator();
+    	ArrayList<Field> list = new ArrayList<Field>(fields.length);
+    	for (int i = 0; i < fields.length; i++) {
+    		list.add(fieldContents[i]);
+    	}
+        return list.iterator();
     }
 }
