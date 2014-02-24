@@ -15,7 +15,6 @@ import java.util.*;
  */
 public class HeapFile implements DbFile {
 	
-	ArrayList<HeapPage> heapPages;
 	File file;
 	TupleDesc tupleDesc;
 
@@ -97,6 +96,11 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public void writePage(Page page) throws IOException {
         // some code goes here
+    	RandomAccessFile raf = new RandomAccessFile(file, "rw");
+    	page.markDirty(false, null);
+    	raf.seek(page.getId().pageNumber() *BufferPool.PAGE_SIZE);
+    	raf.write(page.getPageData(), 0, BufferPool.PAGE_SIZE);
+        raf.close();
         // not necessary for proj1
     }
 
@@ -113,7 +117,31 @@ public class HeapFile implements DbFile {
     public ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
             throws DbException, IOException, TransactionAbortedException {
         // some code goes here
-        return null;
+    	ArrayList<Page> effectedPages = new ArrayList<Page>();
+    	BufferPool bp = Database.getBufferPool();
+    	PageId pId;
+    	for (int i=0; i<numPages(); i++) {
+    		HeapPage page = (HeapPage) bp.getPage(tid, new HeapPageId(getId(), i), Permissions.READ_WRITE);
+    		if (page.getNumEmptySlots() != 0) {
+    			try {
+    				page.insertTuple(t);
+    			} catch (DbException d) {
+    				continue;
+    			}
+    			//if insert successful
+    			//no need to set recordId, page.insertTuple does already
+    			page.markDirty(true, tid);
+    			effectedPages.add(page);
+    			return effectedPages;
+    		}
+    	}
+    	//insert failed if I'm here
+    	HeapPageId newPageId = new HeapPageId(getId(), numPages());
+    	HeapPage insertPage = new HeapPage(newPageId, new byte[BufferPool.PAGE_SIZE]);
+    	insertPage.insertTuple(t);
+    	writePage(insertPage);
+    	effectedPages.add(insertPage);
+    	return effectedPages;
         // not necessary for proj1
     }
 
@@ -121,7 +149,11 @@ public class HeapFile implements DbFile {
     public Page deleteTuple(TransactionId tid, Tuple t) throws DbException,
             TransactionAbortedException {
         // some code goes here
-        return null;
+    	BufferPool bp = Database.getBufferPool();
+    	HeapPage page = (HeapPage) bp.getPage(tid, t.getRecordId().getPageId(), Permissions.READ_WRITE);
+    	page.deleteTuple(t);
+    	page.markDirty(true, tid);
+        return page;
         // not necessary for proj1
     }
 

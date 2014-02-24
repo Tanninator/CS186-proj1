@@ -117,8 +117,7 @@ public class TupleDesc implements Serializable {
      *             if i is not a valid field reference.
      */
     public Type getFieldType(int i) throws NoSuchElementException {
-    	if (i<itemList.size() || i > -1
-    			) {
+    	if (i<itemList.size() && i > -1) {
     		return itemList.get(i).fieldType;
     	} else {
     		throw new NoSuchElementException();
@@ -170,15 +169,15 @@ public class TupleDesc implements Serializable {
      * @return the new TupleDesc
      */
     public static TupleDesc merge(TupleDesc td1, TupleDesc td2) {
-        Type[] typeList = new Type[td1.getSize()+td2.getSize()];
-        String[] nameList = new String[td1.getSize()+td2.getSize()];
-        for(int i=0; i<td1.getSize(); i++) {
+        Type[] typeList = new Type[td1.numFields()+td2.numFields()];
+        String[] nameList = new String[td1.numFields()+td2.numFields()];
+        for(int i=0; i<td1.numFields(); i++) {
         	typeList[i] = td1.getFieldType(i);
         	nameList[i] = td1.getFieldName(i);
         }
-        for(int i=0; i<td2.getSize(); i++) {
-        	typeList[i+td1.getSize()] = td2.getFieldType(i);
-        	nameList[i+td1.getSize()] = td2.getFieldName(i);
+        for(int i=0; i<td2.numFields(); i++) {
+        	typeList[i+td1.numFields()] = td2.getFieldType(i);
+        	nameList[i+td1.numFields()] = td2.getFieldName(i);
         }
         return new TupleDesc(typeList, nameList);
     }

@@ -233,13 +233,15 @@ public class HeapPage implements Page {
      */
     public void deleteTuple(Tuple t) throws DbException {
         // some code goes here
-        for(int i=0; i<tuples.length; i++) {
-        	if (tuples[i] == t) {
-        		tuples[i] = null;
-        	} else {
-        		throw new DbException("");
-        	}
-        }
+    	int index = t.getRecordId().tupleno();
+    	if (t == null || !t.getRecordId().getPageId().equals(pid)) {
+    		throw new DbException("Wrong page");
+    	}
+    	if (!isSlotUsed(index)) {
+    		throw new DbException("Tuple already empty");
+    	}
+    	markSlotUsed(index, false);
+    	tuples[index] = null;
     }
 
     /**
@@ -269,7 +271,7 @@ public class HeapPage implements Page {
      */
     public void markDirty(boolean dirty, TransactionId tid) {
         // some code goes here
-    	dirty = dirty;
+    	this.dirty = dirty;
     	lastTrans = dirty ? tid : null;
     }
 

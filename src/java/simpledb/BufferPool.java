@@ -1,7 +1,11 @@
 package simpledb;
 
 import java.io.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -21,9 +25,11 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
     
+    private LinkedList<PageId> orderUsed = new LinkedList<PageId>();
     private HashMap<PageId, Page> pages;
+    private HashMap<TransactionId, ArrayList<PageId>> tIdtopId = new HashMap<TransactionId, ArrayList<PageId>>();
     int maxPageCount;
-    int pageCount = 0;
+    
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -50,24 +56,34 @@ public class BufferPool {
      * @param pid the ID of the requested page
      * @param perm the requested permissions on the page
      */
-    public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
+    public Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
         if(pages.containsKey(pid)) {
+        	orderUsed.remove(pid);
+        	orderUsed.add(pid);
         	return pages.get(pid);
-        } else if (pageCount < maxPageCount) {
-        	Catalog c = Database.getCatalog();
-            Page page = null;
-            DbFile dbFile = c.getDbFile(pid.getTableId());
-            try {
-            	page = dbFile.readPage(pid);
-            } catch (IllegalArgumentException iae) {
-            }
-        	pages.put(pid, page);
-        	pageCount++;
-        	return page;
-        } else {
-        	throw new TransactionAbortedException();
         }
+        while(pages.size() > maxPageCount) {
+    		evictPage();
+    	}
+    	Catalog c = Database.getCatalog();
+        Page page = null;
+        DbFile dbFile = c.getDbFile(pid.getTableId());
+        try {
+        	page = dbFile.readPage(pid);
+        } catch (IllegalArgumentException iae) {
+        }
+    	pages.put(pid, page);
+    	ArrayList<PageId> pList = tIdtopId.get(tid);
+    	if (pList != null) {
+    		pList.add(pid);
+    	} else {
+    		ArrayList<PageId> newPageList = new ArrayList<PageId>();
+    		newPageList.add(pid);
+    		tIdtopId.put(tid, newPageList);
+    	}
+    	orderUsed.add(pid);
+    	return page;
     }
 
     /**
@@ -131,6 +147,8 @@ public class BufferPool {
     public void insertTuple(TransactionId tid, int tableId, Tuple t)
         throws DbException, IOException, TransactionAbortedException {
         // some code goes here
+    	HeapFile heapFile = (HeapFile) Database.getCatalog().getDbFile(tableId);
+    	heapFile.insertTuple(tid, t); //dirtiness marker delegated to heapFile insert
         // not necessary for proj1
     }
 
@@ -150,6 +168,8 @@ public class BufferPool {
     public  void deleteTuple(TransactionId tid, Tuple t)
         throws DbException, TransactionAbortedException {
         // some code goes here
+    	DbFile file = Database.getCatalog().getDbFile(t.getRecordId().getPageId().getTableId());
+    	file.deleteTuple(tid, t); //dirtiness marker delegated to heapFile insert
         // not necessary for proj1
     }
 
@@ -160,6 +180,9 @@ public class BufferPool {
      */
     public synchronized void flushAllPages() throws IOException {
         // some code goes here
+    	for(PageId key: pages.keySet()) {
+    		flushPage(key);
+    	}
         // not necessary for proj1
 
     }
@@ -172,6 +195,10 @@ public class BufferPool {
     public synchronized void discardPage(PageId pid) {
         // some code goes here
 	// not necessary for proj1
+    	if (pages.containsKey(pid)) {
+    		pages.remove(pid);
+    		orderUsed.remove(pid);
+    	}
     }
 
     /**
@@ -180,6 +207,8 @@ public class BufferPool {
      */
     private synchronized  void flushPage(PageId pid) throws IOException {
         // some code goes here
+    	DbFile file = Database.getCatalog().getDbFile(pid.getTableId());
+    	file.writePage(pages.get(pid));
         // not necessary for proj1
     }
 
@@ -188,6 +217,14 @@ public class BufferPool {
     public synchronized  void flushPages(TransactionId tid) throws IOException {
         // some code goes here
         // not necessary for proj1
+    	if (tIdtopId.containsKey(tid)) {
+    		ArrayList<PageId> pIds = tIdtopId.get(tid);
+    		for(PageId pId: pIds) {
+    			flushPage(pId);
+    			orderUsed.remove(pId);
+    		}
+    	}
+    		
     }
 
     /**
@@ -197,6 +234,8 @@ public class BufferPool {
     private synchronized  void evictPage() throws DbException {
         // some code goes here
         // not necessary for proj1
+    	PageId pid = orderUsed.poll();
+    	pages.remove(pid);
     }
 
 }

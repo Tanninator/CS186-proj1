@@ -74,7 +74,11 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return fieldContents[i];
+    	if (i<fieldContents.length) {
+    		return fieldContents[i];
+    	} else {
+    		return null;
+    	}
     }
 
     /**
@@ -88,7 +92,9 @@ public class Tuple implements Serializable {
     public String toString() {
     	String resultString = "";
     	for(int i=0; i<fieldContents.length; i++) {
-    		resultString += fieldContents[i].toString() + " ";
+    		if (fieldContents[i] != null) {
+    			resultString += fieldContents[i].toString() + " ";
+    		}
     	}
     	resultString += "\n";
     	return resultString;
